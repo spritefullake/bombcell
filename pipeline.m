@@ -44,37 +44,40 @@ param.cellTypeDuration = 400;
 param.cellTypePostS = 40;
 
 
-%% load experiment 
-% you can use any other script to load your data, you need to end up with:
-% xxxxx
-animals={'AP024'};
-curr_animal = 1; % (set which animal to use)
-animal = animals{curr_animal};
-protocol = 'vanillaChoiceworld'; % (this is the name of the Signals protocol)
-experiments = AP_find_experimentsJF(animal, protocol, true);
-experiments = experiments([experiments.imaging] & [experiments.ephys]);
-curr_day = 1; % (set which day to use)
-day = experiments(curr_day).day; % date
-thisDay = experiments(curr_day).day; % date
-thisDate = thisDay;
-experiment = experiments(curr_day).experiment; % experiment number
-load_parts.cam=false;
-load_parts.imaging=true;
-load_parts.ephys=true;
+% %% load experiment 
+% % you can use any other script to load your data, you need to end up with:
+% % xxxxx
+% animals={'AP024'};
+% curr_animal = 1; % (set which animal to use)
+% animal = animals{curr_animal};
+% protocol = 'vanillaChoiceworld'; % (this is the name of the Signals protocol)
+% experiments = AP_find_experimentsJF(animal, protocol, true);
+% experiments = experiments([experiments.imaging] & [experiments.ephys]);
+% curr_day = 1; % (set which day to use)
+% day = experiments(curr_day).day; % date
+% thisDay = experiments(curr_day).day; % date
+% thisDate = thisDay;
+% experiment = experiments(curr_day).experiment; % experiment number
+% load_parts.cam=false;
+% load_parts.imaging=true;
+% load_parts.ephys=true;
 
 %loading
-[ephys_path, ephys_exists] = AP_cortexlab_filenameJF(animal, day, experiment, 'ephys',[],[]);
+% [ephys_path, ephys_exists] = AP_cortexlab_filenameJF(animal, day, experiment, 'ephys',[],[]);
 %ephys_path = strcat(experiments(curr_day).location, '\ephys\kilosort2\');
-corona = 0;
-ephysData = loadEphysDataJF(ephys_path, animal, day, experiment); %load and format ephysData to use later 
-
+% corona = 0;
+% ephysData = loadEphysDataJF(ephys_path, animal, day, experiment); %load and format ephysData to use later 
+ephys_path = 'H:\Neuropixels Data\20201023-WT\20201023-WT-baseline+PTZ\2020-10-23_10-44-16_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+%'H:\Neuropixels Data\20210216 striatum-938 HOM-20200607 CamKII-Gi-PrL-20210121 headplate\2021-02-16_14-02-37_extracted\continuous\Neuropix-PXI-slot4-probe2-AP' 
+%'H:\Neuropixels Data\20200915-WT\20200915-WT-baseline2+PTZ\2020-09-15_15-23-58_extracted\continuous\Neuropix-PXI-slot4-probe2-AP';
+ephysData = loadEphysDataJF(ephys_path);
 %% run quality metrics 
 getQualityMetrics;
 
 %% run ephys properties
 getEphysProperties;
 
-keep qMetric ephysParams ephysData param 
+keep qMetric ephysParams ephysData param  
 
 %% classify cells 
 classifyStriatum; 
