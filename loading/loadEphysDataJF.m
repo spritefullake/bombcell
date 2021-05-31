@@ -1,6 +1,12 @@
 function ephysData = loadEphysDataJF(ephys_path)
 load_parts.ephys=true; 
+<<<<<<< HEAD
 %AP_load_experimentJF;
+=======
+isSpikeGlx=0;
+loadClusters = 0;
+AP_load_experimentJF;
+>>>>>>> origin/master
 
 spike_templates_0idx = readNPY([ephys_path filesep 'spike_templates.npy']);
 spike_times = readNPY([ephys_path filesep  'spike_times.npy']);
