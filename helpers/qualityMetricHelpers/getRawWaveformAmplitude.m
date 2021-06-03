@@ -10,13 +10,13 @@ if ~isempty(curr_spikes_idx)
     if curr_pull_spikes(1) == 0
         curr_pull_spikes(1) = [];
     end
-    curr_spikeT = ephysData.spike_times_full(curr_spikes_idx(curr_pull_spikes));
+    curr_spikeT = ephysData.integer_spike_times(curr_spikes_idx(curr_pull_spikes));
     curr_spikeT_pull = double(curr_spikeT) + raw.pull_spikeT;
 
     out_of_bounds_spikes = any(curr_spikeT_pull < 1, 2) | ...
         any(curr_spikeT_pull > size(raw.ap_data.data.data, 2), 2);
     curr_spikeT_pull(out_of_bounds_spikes, :) = [];
-
+    
     curr_spike_waveforms = reshape(raw.ap_data.data.data(:, reshape(curr_spikeT_pull', [], 1)), raw.n_channels, length(raw.pull_spikeT), []);
     if ~isempty(curr_spike_waveforms)
         curr_spike_waveforms_car = curr_spike_waveforms - nanmedian(curr_spike_waveforms, 1);
