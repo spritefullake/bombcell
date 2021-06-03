@@ -54,3 +54,7 @@ eliminate waveforms of a low amplitude to remove noisy, further away units, that
 - https://uk.mathworks.com/matlabcentral/fileexchange/181-keep 
 
 - https://uk.mathworks.com/matlabcentral/fileexchange/1805-rgb-m
+
+### Plotting Dependencies
+- makepretty.m from https://github.com/nsteinme/nickBox/blob/master/matlab/plotting/makepretty.m
+- plotshaded.m from https://github.com/peterboord/neuroimaging
