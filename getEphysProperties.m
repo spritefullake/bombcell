@@ -91,8 +91,8 @@ for iUnit = 1:size(allT, 1)
         %    (curr_isi(2:end) + curr_isi(1:end-1))]; %WRONG, see Holt 1996
     end
 
-    ephysParams.prop_long_isi(iUnit) = long_isi_total / ...
-        (sum(use_spiking_stat_bins(:)) * spiking_stat_window);
+    ephysParams.prop_long_isi(iUnit) = double(long_isi_total) / ...
+        (sum(use_spiking_stat_bins(:)) * double(spiking_stat_window));
 
     %% ~~ Other ephys properties ~~
 end
