@@ -46,9 +46,6 @@ for iUnit = 1:size(allT, 1)
     qMetric.numSpikes(iUnit) = numel(theseSpikes);
 
     %% % spikes missing in xx chunks
-    %super hacky - you have to cd to directory where gaussFit.py lives for
-    %this to work. - change to where your file lives on your computer
-    cd('C:\Users\ahmad45\Desktop\bombcell\helpers\qualityMetricHelpers')
     try
         [percent_missing_ndtrAll, ~] = ampli_fit_prc_missJF(theseAmplis, 0);
     catch

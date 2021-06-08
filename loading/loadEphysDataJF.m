@@ -19,13 +19,18 @@ spike_templates_full = spike_templates_0idx + 1;
 channel_map = readNPY([ephys_path, filesep, 'channel_map.npy']);
 channel_positions = readNPY([ephys_path, filesep, 'channel_positions.npy']);
 winv = readNPY([ephys_path, filesep, 'whitening_mat_inv.npy']);
+%% Cluster Curation
+% since cluster_groups doesn't seem to update from PHY curation,
+% use cluster_info, which does seem to update through PHY gui
+cluster_info_filename = [ephys_path, filesep, 'cluster_info', '.tsv']
+cluster_info = tdfread(cluster_info_filename)
+groups = strip(string(cluster_info.group))
+KSLabels = strip(string(cluster_info.KSLabel))
+groups(groups == "") = KSLabels(groups == "") % fallback to the Kilosort-provided label if no manual curation found
+groups(cluster_info.n_spikes < 300) = "unsorted" % remove spikes < 300
+cluster_groups = { cluster_info.id, groups }
 
-cluster_filename = [ephys_path, filesep, 'cluster_group', '.tsv'];
-fid = fopen(cluster_filename)
-cluster_groups = textscan(fid, '%d%s', 'HeaderLines', 1);
-disp(cluster_groups)
-fclose(fid);
-
+%% Continue loading struct fields
 templates_whitened = readNPY([ephys_path, filesep, 'templates.npy']);
 template_amplitudes = readNPY([ephys_path, filesep, 'amplitudes.npy']);
 
@@ -79,7 +84,6 @@ spike_times_timeline = spike_times_full
 spike_templates_0idx_unique = unique(spike_templates_0idx);
 if ~all(ismember(spike_templates_0idx_unique, uint32(cluster_groups{1}))) || ...
         ~all(ismember(cluster_groups{2}, {'good', 'mua', 'noise'}))
-    warning([animal, ' ', day, ': not all templates labeled']);
 end
 
 % Define good units from labels

@@ -18,3 +18,9 @@ cellTypesClassif(1).cells = msn;
 cellTypesClassif(2).cells = fsi;
 cellTypesClassif(3).cells = tan;
 cellTypesClassif(4).cells = uin;
+
+cellTypes = struct;
+cellTypes.msn = msn;
+cellTypes.fsi = fsi;
+cellTypes.tan = tan;
+cellTypes.uin = uin;

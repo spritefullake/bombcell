@@ -1,4 +1,7 @@
 %% Pipeline 
+%% 0. Preliminary setup
+% matlab path
+addpath(genpath([pwd, filesep, 'helpers']))
 %% 1. define parameters for quality metrics, ephys properties and
 %% classification 
 %define parameters
@@ -43,31 +46,21 @@ param.maxdt = 10;
 param.cellTypeDuration = 400;
 param.cellTypePostS = 40;
 
-
 % %% load experiment 
-% % you can use any other script to load your data, you need to end up with:
-% % xxxxx
-% animals={'AP024'};
-% curr_animal = 1; % (set which animal to use)
-% animal = animals{curr_animal};
-% protocol = 'vanillaChoiceworld'; % (this is the name of the Signals protocol)
-% experiments = AP_find_experimentsJF(animal, protocol, true);
-% experiments = experiments([experiments.imaging] & [experiments.ephys]);
-% curr_day = 1; % (set which day to use)
-% day = experiments(curr_day).day; % date
-% thisDay = experiments(curr_day).day; % date
-% thisDate = thisDay;
-% experiment = experiments(curr_day).experiment; % experiment number
-% load_parts.cam=false;
-% load_parts.imaging=true;
-% load_parts.ephys=true;
+% % you can use any other script to load your data
+ephys_path = uigetdir('H:\Neuropixels Data')
 
-%loading
-% [ephys_path, ephys_exists] = AP_cortexlab_filenameJF(animal, day, experiment, 'ephys',[],[]);
-%ephys_path = strcat(experiments(curr_day).location, '\ephys\kilosort2\');
-% corona = 0;
-% ephysData = loadEphysDataJF(ephys_path, animal, day, experiment); %load and format ephysData to use later 
-ephys_path = 'H:\Neuropixels Data\20201023-WT\20201023-WT-baseline+PTZ\2020-10-23_10-44-16_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+%'H:\Neuropixels Data\20210216 striatum-938 HOM-20200607 CamKII-Gi-PrL-20210121 headplate\2021-02-16_16-20-06_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+%'H:\Neuropixels Data\20210216 striatum-938 HOM-20200607 CamKII-Gi-PrL-20210121 headplate\2021-02-16_16-20-06_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+
+%'H:\Neuropixels Data\20201030-WT\20201030-WT-baseline+PTZ\2020-10-30_12-27-33_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+
+%'H:\Neuropixels Data\20200915-WT\20200915-WT-baseline2+PTZ\2020-09-15_15-23-58_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+%'H:\Neuropixels Data\20210216 striatum-938 HOM-20200607 CamKII-Gi-PrL-20210121 headplate\2021-02-16_16-20-06_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+%'H:\Neuropixels Data\20200915-WT\20200915-WT-baseline2+PTZ\2020-09-15_15-23-58_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+%'H:\Neuropixels Data\20210216 striatum-938 HOM-20200607 CamKII-Gi-PrL-20210121 headplate\2021-02-16_16-20-06_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+%'H:\Neuropixels Data\20210216 striatum-938 HOM-20200607 CamKII-Gi-PrL-20210121 headplate\2021-02-16_14-02-37_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
+%'H:\Neuropixels Data\20201023-WT\20201023-WT-baseline+PTZ\2020-10-23_10-44-16_extracted\continuous\Neuropix-PXI-slot4-probe2-AP'
 %'H:\Neuropixels Data\20210216 striatum-938 HOM-20200607 CamKII-Gi-PrL-20210121 headplate\2021-02-16_14-02-37_extracted\continuous\Neuropix-PXI-slot4-probe2-AP' 
 %'H:\Neuropixels Data\20200915-WT\20200915-WT-baseline2+PTZ\2020-09-15_15-23-58_extracted\continuous\Neuropix-PXI-slot4-probe2-AP';
 ephysData = loadEphysDataJF(ephys_path);
@@ -77,11 +70,34 @@ getQualityMetrics;
 %% run ephys properties
 getEphysProperties;
 
-keep qMetric ephysParams ephysData param  
+keep qMetric ephysParams ephysData param ephys_path
 
 %% classify cells 
 classifyStriatum; 
 
+%% show cell types percentages
+figure();
+pie([sum(msn), sum(tan), sum(fsi), sum(uin)]);
+lgd = legend({'msn','tan','fsi','uin'});
+lgd.Location = 'south';
+title("Cell Type Percentages");
+%save qualityMetrics, ephysProperties and classification
+%% Plot histograms of spike/s counts per cell type
+figure();
+cellTypeNames = fields(cellTypes);
+for iCellType=1:length(cellTypeNames)
+    subplot(1,length(cellTypeNames),iCellType)
+    cellTypeIndices = cellTypes.(cellTypeNames{iCellType});
+    spike_data = ephysParams.spike_rateAP(cellTypeIndices);
+    [~,edges] = histcounts(log10(spike_data));
+    %new_edges = linspace(min(edges),max(edges),20);
+    histogram(spike_data,10.^edges);
+    set(gca, 'xscale','log');
+    title(cellTypeNames{iCellType});
+    ylabel('Count')
+    xlabel('Spikes/s')
+end
+%% JF's plot checks; seems to work only if nothing is 'unsorted'
 %very quick plotting-just to check 
 celltype_col = ...
     [0.9,0.4,0.6; ...
@@ -110,4 +126,3 @@ for iCellType=1:4
         nanmean(ephysParams.ACG(cellTypesClassif(iCellType).cells,:)) + ...
         nanstd(ephysParams.ACG(cellTypesClassif(iCellType).cells,:))],celltype_col(iCellType,:))
 end
-%save qualityMetrics, ephysProperties and classification
